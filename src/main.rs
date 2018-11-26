@@ -15,9 +15,9 @@ use self::game_state::GameState;
 
 fn main() {
   let mut ctx = ggez::ContextBuilder::new(
-    "demo game: top-down", "Noah"
+    "noframe demo game: topdown", "Noah"
   ).window_setup(
-    ggez::conf::WindowSetup::default().title("Demo Game: Top-Down!")
+    ggez::conf::WindowSetup::default().title("noframe Demo Game: Top-Down!")
   ).window_mode(
     ggez::conf::WindowMode::default().dimensions(
       800u32,

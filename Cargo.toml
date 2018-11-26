@@ -1,5 +1,5 @@
 [package]
-name = "demo"
+name = "noframe-demo-topdown"
 version = "0.0.0"
 authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
 
