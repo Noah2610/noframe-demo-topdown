@@ -1,0 +1,8 @@
+[package]
+name = "demo"
+version = "0.0.0"
+authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
+
+[dependencies]
+ggez = "0.4.4"
+noframe = { path = "../noframe" }
