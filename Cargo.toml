@@ -2,6 +2,7 @@
 name = "noframe-demo-topdown"
 version = "0.0.0"
 authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
+license = "Unlicense"
 
 [dependencies]
 ggez = "0.4.4"
