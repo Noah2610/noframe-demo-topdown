@@ -10,15 +10,22 @@ use ::ggez::{
   }
 };
 
-use ::noframe::entity::Entity;
+use ::noframe::geo::mask::Mask;
+use ::noframe::entity::{
+  Entity,
+  Movement
+};
 use ::noframe::input_manager::InputManager;
+
 use ::player::Player;
+use ::wall::Wall;
 
 const FPS: f32 = 30.0;
 const UPDATE_INTERVAL_MS: u64 = (1.0 / FPS * 1000.0) as u64;
 
 pub struct GameState {
   player:        Player,
+  walls:         Vec<Wall>,
   input_manager: InputManager,
   running:       bool,
   last_update:   Instant
@@ -27,7 +34,13 @@ pub struct GameState {
 impl GameState {
   pub fn new() -> Self {
     Self {
-      player:        Player::new(),
+      player: Player::new(256.0, 256.0),
+      walls:  vec![
+        Wall::new_default_size(0.0,   0.0),
+        Wall::new_default_size(64.0,  0.0),
+        Wall::new_default_size(128.0, 0.0),
+        Wall::new_default_size(192.0, 0.0),
+      ],
       input_manager: InputManager::new(),
       running:       true,
       last_update:   Instant::now()
@@ -60,7 +73,14 @@ impl event::EventHandler for GameState {
       return Ok(());
     }
 
+    for wall in &mut self.walls {
+      wall.update(_ctx)?;
+    }
     self.player.keys_pressed(self.input_manager.keys());
+
+    // TODO
+    // self.player.move_while( |rect| self.walls.iter().any( |wall| rect.intersects(wall) ) );
+
     self.player.update(_ctx)?;
 
     return Ok(());
@@ -69,6 +89,9 @@ impl event::EventHandler for GameState {
   fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
     graphics::clear(ctx);
 
+    for wall in &mut self.walls {
+      wall.draw(ctx)?;
+    }
     self.player.draw(ctx)?;
 
     graphics::present(ctx);

@@ -1,6 +1,10 @@
 extern crate ggez;
 extern crate noframe;
 
+mod game_state;
+mod player;
+mod wall;
+
 use ggez::{
   Context,
   graphics,
@@ -9,8 +13,6 @@ use ggez::{
 
 use noframe::geo::prelude::*;
 
-mod game_state;
-mod player;
 use self::game_state::GameState;
 
 fn main() {

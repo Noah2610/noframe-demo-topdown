@@ -4,9 +4,17 @@ use ::ggez::{
   event::Keycode
 };
 
-use ::noframe::geo::prelude::*;
+use ::noframe::geo::{
+  prelude::*,
+  NumType
+};
 use ::noframe::entity::prelude::*;
+use ::noframe::color::{
+  self,
+  Color
+};
 
+const COLOR: Color = [0.4, 0.6, 0.7, 1.0];
 const SIZE: Size = Size { w: 32.0, h: 32.0 };
 const SPEED: ::noframe::geo::NumType = 4.0;
 const SPEED_DECREASE: ::noframe::geo::NumType = 4.0;
@@ -30,17 +38,19 @@ pub struct Player {
   point:        Point,
   size:         Size,
   origin:       Origin,
+  color:        Color,
   velocity:     Point,
   max_velocity: Point,
   has_moved:    Vec<Axis>
 }
 
 impl Player {
-  pub fn new() -> Self {
+  pub fn new(x: NumType, y: NumType) -> Self {
     Self {
-      point:        Point::new(64.0, 64.0),
+      point:        Point::new(x, y),
       size:         SIZE,
       origin:       Origin::TopLeft,
+      color:        COLOR,
       velocity:     Point::new(0.0, 0.0),
       max_velocity: Point::new(MAX_VELOCITY, MAX_VELOCITY),
       has_moved:    Vec::new()
@@ -50,23 +60,31 @@ impl Player {
   pub fn keys_pressed(&mut self, pressed_keys: &Vec<Keycode>) {
     for &keycode in pressed_keys {
       if let Some(point) = match keycode {
-        controls::UP    => {
-          self.moved_on_axis(Axis::Y);
-          Some(Point::new( 0.0,   -SPEED))
+        controls::UP => {
+          if !self.has_moved(Axis::Y) {
+            self.moved_on_axis(Axis::Y);
+            Some(Point::new( 0.0, -SPEED ))
+          } else { None }
         }
-        controls::DOWN  => {
-          self.moved_on_axis(Axis::Y);
-          Some(Point::new( 0.0,    SPEED))
+        controls::DOWN => {
+          if !self.has_moved(Axis::Y) {
+            self.moved_on_axis(Axis::Y);
+            Some(Point::new( 0.0, SPEED ))
+          } else { None }
         }
-        controls::LEFT  => {
-          self.moved_on_axis(Axis::X);
-          Some(Point::new(-SPEED,  0.0))
+        controls::LEFT => {
+          if !self.has_moved(Axis::X) {
+            self.moved_on_axis(Axis::X);
+            Some(Point::new( -SPEED, 0.0 ))
+          } else { None }
         }
         controls::RIGHT => {
-          self.moved_on_axis(Axis::X);
-          Some(Point::new( SPEED,  0.0 ))
+          if !self.has_moved(Axis::X) {
+            self.moved_on_axis(Axis::X);
+            Some(Point::new( SPEED, 0.0 ))
+          } else { None }
         }
-        _               => None
+        _ => None
       } {
         self.add_velocity(&point);
       }
@@ -86,7 +104,9 @@ impl Player {
   fn update_position(&mut self) {
     let vel = self.velocity().clone();
     self.handle_decrease_velocity();
-    self.point_mut().add(&vel);
+
+    // self.point_mut().add(&vel);
+
     self.has_moved.clear();
   }
 
@@ -119,6 +139,10 @@ impl Mask for Player {
 }
 
 impl Entity for Player {
+  fn color(&self) -> Color {
+    self.color
+  }
+
   fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
     self.update_position();
     return Ok(());
@@ -136,3 +160,5 @@ impl Velocity for Player {
     &self.max_velocity
   }
 }
+
+impl Movement for Player {}
