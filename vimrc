@@ -1,2 +1,2 @@
-nmap <leader>r :!cargo run<CR>
-nmap <leader>R :!cargo build<CR>
+nmap <leader>r :!bin/build && cargo run<CR>
+nmap <leader>R :!bin/build<CR>

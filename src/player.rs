@@ -16,9 +16,9 @@ use ::noframe::color::{
 
 const COLOR: Color = [0.4, 0.6, 0.7, 1.0];
 const SIZE: Size = Size { w: 32.0, h: 32.0 };
-const SPEED: ::noframe::geo::NumType = 4.0;
+const SPEED: ::noframe::geo::NumType = 2.0;
 const SPEED_DECREASE: ::noframe::geo::NumType = 4.0;
-const MAX_VELOCITY: ::noframe::geo::NumType = 16.0;
+const MAX_VELOCITY: ::noframe::geo::NumType = 8.0;
 
 mod controls {
   use ::ggez::event::Keycode;

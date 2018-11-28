@@ -1,4 +1,6 @@
 use ::std::time::{ Instant, Duration };
+use ::std::fs::File;
+use ::std::io::prelude::*;
 
 use ::ggez::{
   Context,
@@ -23,6 +25,15 @@ use ::wall::Wall;
 const FPS: f32 = 30.0;
 const UPDATE_INTERVAL_MS: u64 = (1.0 / FPS * 1000.0) as u64;
 
+fn load_walls(json_filepath: &str) -> GameResult<Vec<Wall>> {
+  let mut file = File::open(json_filepath)?;
+  let mut json = String::new();
+  file.read_to_string(&mut json)?;
+  let data = json::parse(&json);
+  println!("{:#?}", data);
+  return Ok(Vec::new());
+}
+
 pub struct GameState {
   player:        Player,
   walls:         Vec<Wall>,
@@ -32,19 +43,14 @@ pub struct GameState {
 }
 
 impl GameState {
-  pub fn new() -> Self {
-    Self {
-      player: Player::new(256.0, 256.0),
-      walls:  vec![
-        Wall::new_default_size(0.0,   0.0),
-        Wall::new_default_size(64.0,  0.0),
-        Wall::new_default_size(128.0, 0.0),
-        Wall::new_default_size(192.0, 0.0),
-      ],
+  pub fn new() -> GameResult<Self> {
+    Ok(Self {
+      player:        Player::new(256.0, 256.0),
+      walls:         load_walls("./resources/walls.json")?,
       input_manager: InputManager::new(),
       running:       true,
       last_update:   Instant::now()
-    }
+    })
   }
 }
 
@@ -78,8 +84,12 @@ impl event::EventHandler for GameState {
     }
     self.player.keys_pressed(self.input_manager.keys());
 
-    // TODO
-    // self.player.move_while( |rect| self.walls.iter().any( |wall| rect.intersects(wall) ) );
+    let new_pos = self.player.get_move_while(
+      |rect| !self.walls.iter().any( |wall| rect.intersects(wall) )
+    );
+    if &new_pos != self.player.point() {
+      self.player.point_mut().set(&new_pos);
+    }
 
     self.player.update(_ctx)?;
 
