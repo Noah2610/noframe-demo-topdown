@@ -17,4 +17,5 @@ ROOT="$( get_root_dir )"
 if cargo build "$@" && [ -d "$DIR_TO_COPY" ]; then
   [ -d "$ROOT/target/debug" ]   && cp -r "$DIR_TO_COPY" "$ROOT/target/debug"
   [ -d "$ROOT/target/release" ] && cp -r "$DIR_TO_COPY" "$ROOT/target/release"
+  true
 fi

@@ -79,12 +79,12 @@ function save_level() {
     if (b.data('instance') && !(parseInt(b.css('width')) == 0 || parseInt(b.css('height')) == 0 )) {
       blocks.push({
         position: {
-          x:      parseInt(b.css('left')),
-          y:      parseInt(b.css('top'))
+          x: parseInt(b.css('left')),
+          y: parseInt(b.css('top'))
         },
         size: {
-          width:  parseInt(b.css('width')),
-          height: parseInt(b.css('height'))
+          w: parseInt(b.css('width')),
+          h: parseInt(b.css('height'))
         }
       });
     }
@@ -92,10 +92,10 @@ function save_level() {
 
   const data = Object.assign({}, {
     size: {
-      width:  settings.room_size.w,
-      height: settings.room_size.h
+      w: settings.room_size.w,
+      h: settings.room_size.h
     },
-    walls: blocks
+    instances: blocks
   }, settings.additional_json);
   const data_string = JSON.stringify(data);
   // Copy level data to clipboard

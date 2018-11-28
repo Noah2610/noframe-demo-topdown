@@ -127,19 +127,23 @@ function load_level(data) {
   const block_wrapper = $('#blocks')
   block_wrapper.empty();
 
-  if (!!json.size) {
-    if (!!json.size.w)
+  if (json.size) {
+    if (json.size.w) {
       settings.room_size.w = json.size.w;
-    if (!!json.size.h)
+      $('#panel__room_size__w').val(json.size.w);
+    }
+    if (json.size.h) {
       settings.room_size.h = json.size.h;
+      $('#panel__room_size__h').val(json.size.h);
+    }
   }
 
   // Generate DOMs
   json.instances.forEach(function (instance) {
-    const x = instance.x + "px";
-    const y = instance.y + "px";
-    const w = instance.w + "px";
-    const h = instance.h + "px";
+    const x = instance.position.x + "px";
+    const y = instance.position.y + "px";
+    const w = instance.size.w + "px";
+    const h = instance.size.h + "px";
     const type = instance.type;
     const color = settings.colors[instance.type];
 
@@ -152,6 +156,7 @@ function load_level(data) {
     block.css("background-color", color);
     block.data("instance", type);
 
+    console.log(block);
     block_wrapper.append(block);
   });
 
