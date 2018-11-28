@@ -30,8 +30,12 @@ fn load_walls(json_filepath: &str) -> GameResult<Vec<Wall>> {
   let mut json = String::new();
   file.read_to_string(&mut json)?;
   let data = json::parse(&json);
-  println!("{:#?}", data);
-  return Ok(Vec::new());
+  return Ok(vec![
+            Wall::new_default_size(0.0,   0.0),
+            Wall::new_default_size(64.0,  0.0),
+            Wall::new_default_size(128.0, 0.0),
+            Wall::new_default_size(192.0, 0.0),
+  ]);
 }
 
 pub struct GameState {
