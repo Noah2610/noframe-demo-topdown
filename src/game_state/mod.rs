@@ -20,6 +20,7 @@ use ::noframe::entity::{
   Movement
 };
 use ::noframe::input_manager::InputManager;
+use ::noframe::camera::Camera;
 
 use ::player::Player;
 use ::wall::Wall;
@@ -28,18 +29,22 @@ const FPS: f32 = 30.0;
 const UPDATE_INTERVAL_MS: u64 = (1.0 / FPS * 1000.0) as u64;
 
 pub struct GameState {
+  window_rect:   Rect,
   player:        Player,
   walls:         Vec<Wall>,
+  camera:        Camera,
   input_manager: InputManager,
   running:       bool,
   last_update:   Instant
 }
 
 impl GameState {
-  pub fn new() -> GameResult<Self> {
+  pub fn new(window_size: [NumType; 2]) -> GameResult<Self> {
     Ok(Self {
+      window_rect:   Rect::new(Point::new(0.0, 0.0), Size::from(window_size), Origin::TopLeft),
       player:        Player::new(0.0, 128.0),
       walls:         load_walls("./resources/walls.json")?,
+      camera:        Camera::new(),
       input_manager: InputManager::new(),
       running:       true,
       last_update:   Instant::now()
@@ -82,6 +87,9 @@ impl event::EventHandler for GameState {
     );
     if &new_pos != self.player.point() {
       self.player.point_mut().set(&new_pos);
+      self.camera.move_to(&Point::combine(
+          vec![self.player.point(), &self.window_rect.center().inverted()]
+      ));
     }
 
     self.player.update(_ctx)?;
@@ -93,9 +101,9 @@ impl event::EventHandler for GameState {
     graphics::clear(ctx);
 
     for wall in &mut self.walls {
-      wall.draw(ctx)?;
+      self.camera.draw(ctx, wall)?;
     }
-    self.player.draw(ctx)?;
+    self.camera.draw(ctx, &self.player)?;
 
     graphics::present(ctx);
     ::ggez::timer::yield_now();

@@ -9,7 +9,7 @@ pub fn load_walls(json_filepath: &str) -> GameResult<Vec<Wall>> {
   let mut file = File::open(json_filepath)?;
   let mut json = String::new();
   file.read_to_string(&mut json)?;
-  let data = match ::json::parse(&json) {
+  let data = match json::parse(&json) {
     Ok(d)  => d,
     Err(e) => return Err(ggez::GameError::from(e.to_string()))
   };  // I don't think this is idomatic rust...

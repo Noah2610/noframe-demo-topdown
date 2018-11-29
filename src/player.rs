@@ -49,7 +49,7 @@ impl Player {
     Self {
       point:        Point::new(x, y),
       size:         SIZE,
-      origin:       Origin::TopLeft,
+      origin:       Origin::Center,
       color:        COLOR,
       velocity:     Point::new(0.0, 0.0),
       max_velocity: Point::new(MAX_VELOCITY, MAX_VELOCITY),
