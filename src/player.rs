@@ -13,12 +13,13 @@ use ::noframe::color::{
   self,
   Color
 };
+use ::noframe::deltatime::Deltatime;
 
 const COLOR: Color = [0.4, 0.6, 0.7, 1.0];
 const SIZE: Size = Size { w: 32.0, h: 32.0 };
-const SPEED: ::noframe::geo::NumType = 2.0;
-const SPEED_DECREASE: ::noframe::geo::NumType = 4.0;
-const MAX_VELOCITY: ::noframe::geo::NumType = 8.0;
+const SPEED: ::noframe::geo::NumType = 20.0;
+const SPEED_DECREASE: ::noframe::geo::NumType = 100.0;
+const MAX_VELOCITY: ::noframe::geo::NumType = 300.0;
 
 mod controls {
   use ::ggez::event::Keycode;
@@ -41,7 +42,8 @@ pub struct Player {
   color:        Color,
   velocity:     Point,
   max_velocity: Point,
-  has_moved:    Vec<Axis>
+  has_moved:    Vec<Axis>,
+  dt:           Deltatime
 }
 
 impl Player {
@@ -53,7 +55,8 @@ impl Player {
       color:        COLOR,
       velocity:     Point::new(0.0, 0.0),
       max_velocity: Point::new(MAX_VELOCITY, MAX_VELOCITY),
-      has_moved:    Vec::new()
+      has_moved:    Vec::new(),
+      dt:           Deltatime::new()
     }
   }
 
@@ -111,12 +114,13 @@ impl Player {
   }
 
   fn handle_decrease_velocity(&mut self) {
+    let decr = SPEED_DECREASE; //* self.dt.secs();
     let decr_vel = Point::new(
       if !self.has_moved(Axis::X) {
-        SPEED_DECREASE
+        decr
       } else { 0.0 },
       if !self.has_moved(Axis::Y) {
-        SPEED_DECREASE
+        decr
       } else { 0.0 }
     );
     self.decrease_velocity(&decr_vel);
@@ -145,6 +149,7 @@ impl Entity for Player {
 
   fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
     self.update_position();
+    self.dt.update();
     return Ok(());
   }
 }
@@ -153,11 +158,14 @@ impl Velocity for Player {
   fn velocity(&self) -> &Point {
     &self.velocity
   }
+  fn usable_velocity(&self) -> Point {
+    self.velocity.mult_axes_by(self.dt.secs())
+  }
   fn velocity_mut(&mut self) -> &mut Point {
     &mut self.velocity
   }
-  fn max_velocity(&self) -> &Point {
-    &self.max_velocity
+  fn max_velocity(&self) -> Point {
+    self.max_velocity.clone()
   }
 }
 

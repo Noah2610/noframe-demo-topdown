@@ -21,6 +21,7 @@ use ::noframe::entity::{
 };
 use ::noframe::input_manager::InputManager;
 use ::noframe::camera::Camera;
+use ::noframe::deltatime::Deltatime;
 
 use ::player::Player;
 use ::wall::Wall;
@@ -36,12 +37,16 @@ pub struct GameState {
   camera_rect:   Rect,
   input_manager: InputManager,
   running:       bool,
-  last_update:   Instant
+  last_update:   Instant,
+  dt:            Deltatime,
+
+  // TODO tmp
+  tick: u64
 }
 
 impl GameState {
   pub fn new(window_size: [NumType; 2]) -> GameResult<Self> {
-    let level_name = std::env::args().nth(1).unwrap_or("SA_big2".to_string());
+    let level_name = std::env::args().nth(1).unwrap_or("walls".to_string());
     Ok(Self {
       window_rect:   Rect::new(Point::new(0.0, 0.0), Size::from(window_size), Origin::TopLeft),
       player:        Player::new(128.0, 128.0),
@@ -51,7 +56,10 @@ impl GameState {
       camera_rect:   Rect::new(Point::new(0.0, 0.0), Size::from(window_size), Origin::TopLeft),
       input_manager: InputManager::new(),
       running:       true,
-      last_update:   Instant::now()
+      last_update:   Instant::now(),
+      dt:            Deltatime::new(),
+
+      tick: 0
     })
   }
 }
@@ -89,7 +97,7 @@ impl event::EventHandler for GameState {
     self.player.keys_pressed(self.input_manager.keys());
 
     let new_pos = self.player.get_move_while(
-      |rect| !self.walls.iter().any( |wall| rect.intersects(wall) )
+      |rect| !self.walls.iter().any( |wall| rect.intersects_round(wall) )
     );
     if &new_pos != self.player.point() {
       self.player.point_mut().set(&new_pos);
@@ -101,6 +109,13 @@ impl event::EventHandler for GameState {
 
     self.player.update(_ctx)?;
 
+    // TODO tmp
+    if self.tick % (FPS as u64) == 0 {
+      println!("{}", self.dt);
+    }
+    self.tick += 1;
+
+    self.dt.update();
     self.last_update = Instant::now();
     return Ok(());
   }
